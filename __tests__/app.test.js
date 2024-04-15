@@ -3,7 +3,7 @@ const request = require('supertest');
 const db = require('../db/connection');
 const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index');
-const endpoints = require('../endpoints')
+const endpoints = require('../endpoints');
 
 afterAll(() => {
 	db.end();
@@ -41,12 +41,21 @@ describe('/api/topics', () => {
 });
 
 describe('/api', () => {
-    test('GET 200: returns the same information in the endpoints json to the client', () =>{
-        return request(app)
-        .get('/api')
-        .expect(200)
-        .then(({body}) => {
-            expect(body.endpoints).toEqual(endpoints)
-        })
+	test('GET 200: returns the same information in the endpoints json to the client', () => {
+		return request(app)
+			.get('/api')
+			.expect(200)
+			.then(({ body }) => {
+				expect(body.endpoints).toEqual(endpoints);
+			});
+	});
+});
+
+//gets an article by it's id
+    //GET 200: 
+
+describe('/api/articles/:article_id', () => {
+    test('GET 200: Responds with the article that corresponds with the given article id', () => {
+        
     })
 })
