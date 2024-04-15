@@ -14,9 +14,14 @@ beforeEach(() => {
 
 //200 returns topics with slug and description
 
-describe.skip('general errors', () => {
+describe('general errors', () => {
     test('ANY 404: returns a 404 error when given a path that doesn\'t exist', () => {
-
+        return request(app)
+        .get('/api/garbage')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('404 - not found')
+        })
     })
 })
 
