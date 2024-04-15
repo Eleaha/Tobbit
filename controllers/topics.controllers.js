@@ -1,6 +1,4 @@
 const { fetchTopics } = require('../models/topics.models');
-const endpoints = require('../endpoints.json');
-
 
 function getTopics(req, res, next) {
 	fetchTopics().then((topics) => {
@@ -8,4 +6,5 @@ function getTopics(req, res, next) {
 	});
 }
 
-module.exports = { getTopics};
+module.exports = { getTopics };
+
