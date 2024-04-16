@@ -1,4 +1,7 @@
-const { fetchCommentsByArticleId } = require('../models/comments.models');
+const {
+	fetchCommentsByArticleId,
+	insertCommentByArticleId,
+} = require('../models/comments.models');
 const { checkArticleExists } = require('../models/articles.models');
 
 function getCommentsByArticleId(req, res, next) {
@@ -11,4 +14,18 @@ function getCommentsByArticleId(req, res, next) {
 		.catch(next);
 }
 
-module.exports = { getCommentsByArticleId };
+function postCommentByArticleId(req, res, next) {
+	const id = req.params.article_id;
+	const commentToPost = req.body;
+	commentToPost.article_id = +id;
+	return checkArticleExists(id)
+		.then(() => {
+			return insertCommentByArticleId(commentToPost);
+		})
+		.then((comment) => {
+			res.status(201).send({ comment });
+		})
+		.catch(next);
+}
+
+module.exports = { getCommentsByArticleId, postCommentByArticleId };
