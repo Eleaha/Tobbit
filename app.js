@@ -5,6 +5,7 @@ const {
 	getArticleById,
 	getArticles,
 } = require('./controllers/articles.controllers');
+const {getCommentsByArticleId} = require('./controllers/comments.controllers')
 
 const app = express();
 
@@ -13,11 +14,12 @@ app.get('/api', getEndpoints);
 app.get('/api/topics', getTopics);
 
 app.get('/api/articles/:article_id', getArticleById);
-
 app.get('/api/articles', getArticles);
 
+app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
+
 app.all('*', (req, res, next) => {
-	res.status(404).send({ msg: '404 - not found' });
+	res.status(404).send({ msg: 'Not found' });
 });
 
 app.use((err, req, res, next) => {
@@ -37,7 +39,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-	res.status(500).send({ msg: 'Internal Server Error' });
+	res.status(500).send({ msg: 'Internal server error' });
 });
 
 module.exports = app;

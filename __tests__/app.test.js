@@ -19,7 +19,7 @@ describe('general errors', () => {
 			.get('/api/garbage')
 			.expect(404)
 			.then(({ body }) => {
-				expect(body.msg).toBe('404 - not found');
+				expect(body.msg).toBe('Not found');
 			});
 	});
 });
@@ -77,7 +77,7 @@ describe('/api/articles/:article_id', () => {
 			.get('/api/articles/500')
 			.expect(404)
 			.then(({ body }) => {
-				expect(body.msg).toEqual('404 - not found');
+				expect(body.msg).toEqual('Article not found');
 			});
 	});
 	test('GET 400: responds with a 400 error when an invalid id is given', () => {
@@ -120,6 +120,72 @@ describe('/api/articles', () => {
 			.then(({ body }) => {
 				const { articles } = body;
 				expect(articles).toBeSortedBy('created_at', { descending: true });
+			});
+	});
+});
+
+describe('/api/articles/:article_id/comments', () => {
+	test('GET 200: responds with an array of comments with the associated article id', () => {
+		return request(app)
+			.get('/api/articles/3/comments')
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toEqual([
+					{
+						comment_id: 11,
+						body: 'Ambidextrous marsupial',
+						article_id: 3,
+						author: 'icellusedkars',
+						votes: 0,
+						created_at: expect.any(String),
+					},
+					{
+						comment_id: 10,
+						body: 'git push origin master',
+						article_id: 3,
+						author: 'icellusedkars',
+						votes: 0,
+						created_at: expect.any(String),
+					},
+				]);
+			});
+	});
+
+	test('GET 200: responds with an array of comments ordered by created_at in descending order', () => {
+		return request(app)
+			.get('/api/articles/1/comments')
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toBeSortedBy('created_at', { descending: true });
+			});
+	});
+
+	test('GET 200: responds with an empty array when an existing article has no comments', () => {
+		return request(app)
+			.get('/api/articles/2/comments')
+			.expect(200)
+			.then(({ body }) => {
+				expect(body).toEqual({ comments: [] });
+			});
+	});
+
+	test('GET 404: responds with a 404 error if given a valid but non-existent id', () => {
+		return request(app)
+			.get('/api/articles/180/comments')
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toEqual('Article not found');
+			});
+	});
+
+	test('GET 400: responds with a 400 error if invalid article id is given', () => {
+		return request(app)
+			.get('/api/articles/garbage/comments')
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toEqual('Bad request');
 			});
 	});
 });
