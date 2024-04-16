@@ -70,22 +70,56 @@ describe('/api/articles/:article_id', () => {
 					'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
 				);
 			});
-	})
+	});
 
 	test('GET 404: responds with a 404 error when valid but non-existent id is given', () => {
 		return request(app)
 			.get('/api/articles/500')
 			.expect(404)
 			.then(({ body }) => {
-				expect(body.msg).toEqual('404 - not found')
-			})
-	})
+				expect(body.msg).toEqual('404 - not found');
+			});
+	});
 	test('GET 400: responds with a 400 error when an invalid id is given', () => {
 		return request(app)
 			.get('/api/articles/garbage')
 			.expect(400)
 			.then(({ body }) => {
-				expect(body.msg).toEqual('Bad request')
+				expect(body.msg).toEqual('Bad request');
 			});
-	})
+	});
+});
+
+describe('/api/articles', () => {
+	test('GET 200: responds with an array of all articles without the body property and with a comment count', () => {
+		return request(app)
+			.get('/api/articles')
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles.length).toBe(13);
+				articles.forEach((article) => {
+					expect(article).toMatchObject({
+						author: expect.any(String),
+						title: expect.any(String),
+						article_id: expect.any(Number),
+						topic: expect.any(String),
+						created_at: expect.any(String),
+						article_img_url: expect.any(String),
+						votes: expect.any(Number),
+						comment_count: expect.any(Number),
+					});
+				});
+			});
+	});
+	test('GET 200: responds with articles sorted by date in descending order as a default', () => {
+		return request(app)
+			.get('/api/articles')
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toBeSortedBy('created_at', { descending: true });
+			});
+	});
 });

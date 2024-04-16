@@ -20,6 +20,7 @@ run npm i to install
 -> Dev dependencies
 // jest
 // jest-extended
+// jest-sorted
 // supertest
 // pg-format
 // husky
