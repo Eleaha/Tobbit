@@ -17,15 +17,24 @@ function getCommentsByArticleId(req, res, next) {
 function postCommentByArticleId(req, res, next) {
 	const id = req.params.article_id;
 	const commentToPost = req.body;
-	commentToPost.article_id = +id;
-	return checkArticleExists(id)
-		.then(() => {
-			return insertCommentByArticleId(commentToPost);
-		})
-		.then((comment) => {
-			res.status(201).send({ comment });
-		})
-		.catch(next);
+
+	const validKeys = ['username', 'body'];
+
+	if (
+		JSON.stringify(validKeys) !== JSON.stringify(Object.keys(commentToPost))
+	) {
+		res.status(400).send({ msg: 'Bad request' });
+	} else {
+		commentToPost.article_id = +id;
+		return checkArticleExists(id)
+			.then(() => {
+				return insertCommentByArticleId(commentToPost);
+			})
+			.then((comment) => {
+				res.status(201).send({ comment });
+			})
+			.catch(next);
+	}
 }
 
 module.exports = { getCommentsByArticleId, postCommentByArticleId };

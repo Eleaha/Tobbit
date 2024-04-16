@@ -126,7 +126,7 @@ describe('/api/articles', () => {
 });
 
 describe('/api/articles/:article_id/comments', () => {
-	describe('GET', () => {
+	describe('GET /api/articles/:article_id/comments', () => {
 		test('GET 200: responds with an array of comments with the associated article id', () => {
 			return request(app)
 				.get('/api/articles/3/comments')
@@ -192,7 +192,7 @@ describe('/api/articles/:article_id/comments', () => {
 		});
 	});
 
-	describe('POST', () => {
+	describe('POST /api/articles/:article_id/comments', () => {
 		test('POST 201: posts a new comment and returns the comment with an id', () => {
 			const comment = {
 				username: 'butter_bridge',
@@ -226,7 +226,7 @@ describe('/api/articles/:article_id/comments', () => {
 					expect(body.msg).toEqual('Article not found');
 				});
 		});
-		test('POST 400: throws a 400 error when given an invalid article id',() => {
+		test('POST 400: throws a 400 error when given an invalid article id', () => {
 			const comment = {
 				username: 'butter_bridge',
 				body: 'Wow I totally agree!',
@@ -237,7 +237,21 @@ describe('/api/articles/:article_id/comments', () => {
 				.expect(400)
 				.then(({ body }) => {
 					expect(body.msg).toEqual('Bad request');
-				})
-		})
+				});
+		});
+
+		test('POST 400: throws an error when the request body is in an invalid format', () => {
+			const comment = {
+				nickname: 'butter_bridge',
+				body: 'Wow I totally agree!',
+			};
+			return request(app)
+				.post('/api/articles/3/comments')
+				.send(comment)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toEqual('Bad request');
+				});
+		});
 	});
 });
