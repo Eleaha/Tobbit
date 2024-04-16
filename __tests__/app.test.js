@@ -322,3 +322,27 @@ describe('/api/articles/:article_id/comments', () => {
 		});
 	});
 });
+
+describe('/api/comments/:comment_id', () => {
+	describe('DELETE /api/comments/:comment_id', () => {
+		test('DELETE 204: deletes the comment with the associated id and responds with the status code only', () => {
+			return request(app).delete('/api/comments/1').expect(204);
+		});
+		test("DELETE 404: responds with a 404 error if the given comment id doesn't exist", () => {
+			return request(app)
+				.delete('/api/comments/200')
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Comment id not found');
+				});
+		});
+		test.only('DELETE 400: responds with a 400 error when given an invalid id', () => {
+			return request(app)
+				.delete('/api/comments/garbage')
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
+	});
+});
