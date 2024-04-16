@@ -4,7 +4,6 @@ const db = require('../db/connection');
 const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index');
 const endpoints = require('../endpoints');
-const comments = require('../db/data/test-data/comments');
 
 afterAll(() => {
 	db.end();
@@ -90,12 +89,6 @@ describe('/api/articles/:article_id', () => {
 				});
 		});
 	});
-
-	//200 - updated entry returned
-	//400 - invalid format
-	//400 - invalid data
-	//404 - id not found
-	//400 - invalid id
 
 	describe('PATCH /api/articles/:article_id', () => {
 		test('PATCH 200: updates and returns the votes fot eh article with the corresponding id', () => {
