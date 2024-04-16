@@ -53,75 +53,149 @@ describe('/api', () => {
 });
 
 describe('/api/articles/:article_id', () => {
-	test('GET 200: Responds with the article that corresponds with the given article id', () => {
-		return request(app)
-			.get('/api/articles/2')
-			.expect(200)
-			.then(({ body }) => {
-				const { article } = body;
-				expect(article.article_id).toEqual(2);
-				expect(article.title).toEqual('Sony Vaio; or, The Laptop');
-				expect(article.topic).toEqual('mitch');
-				expect(article.author).toEqual('icellusedkars');
-				expect(article.body).toEqual(
-					'Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.'
-				);
-				expect(typeof article.created_at).toEqual('string');
-				expect(article.article_img_url).toEqual(
-					'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
-				);
-			});
+	describe('GET /api/articles/:article_id', () => {
+		test('GET 200: Responds with the article that corresponds with the given article id', () => {
+			return request(app)
+				.get('/api/articles/2')
+				.expect(200)
+				.then(({ body }) => {
+					const { article } = body;
+					expect(article.article_id).toEqual(2);
+					expect(article.title).toEqual('Sony Vaio; or, The Laptop');
+					expect(article.topic).toEqual('mitch');
+					expect(article.author).toEqual('icellusedkars');
+					expect(article.body).toEqual(
+						'Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.'
+					);
+					expect(typeof article.created_at).toEqual('string');
+					expect(article.article_img_url).toEqual(
+						'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+					);
+				});
+		});
+		test('GET 404: responds with a 404 error when valid but non-existent id is given', () => {
+			return request(app)
+				.get('/api/articles/500')
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toEqual('Article not found');
+				});
+		});
+		test('GET 400: responds with a 400 error when an invalid id is given', () => {
+			return request(app)
+				.get('/api/articles/garbage')
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toEqual('Bad request');
+				});
+		});
 	});
 
-	test('GET 404: responds with a 404 error when valid but non-existent id is given', () => {
-		return request(app)
-			.get('/api/articles/500')
-			.expect(404)
-			.then(({ body }) => {
-				expect(body.msg).toEqual('Article not found');
-			});
-	});
-	test('GET 400: responds with a 400 error when an invalid id is given', () => {
-		return request(app)
-			.get('/api/articles/garbage')
-			.expect(400)
-			.then(({ body }) => {
-				expect(body.msg).toEqual('Bad request');
-			});
+	//200 - updated entry returned
+	//400 - invalid format
+	//400 - invalid data
+	//404 - id not found
+	//400 - invalid id
+
+	describe('PATCH /api/articles/:article_id', () => {
+		test('PATCH 200: updates and returns the votes fot eh article with the corresponding id', () => {
+			const votes = { inc_votes: 50 };
+			return request(app)
+				.patch('/api/articles/3')
+				.send(votes)
+				.expect(200)
+				.then(({ body }) => {
+					const { article } = body;
+					expect(article).toMatchObject({
+						article_id: 3,
+						title: 'Eight pug gifs that remind me of mitch',
+						topic: 'mitch',
+						author: 'icellusedkars',
+						body: 'some gifs',
+						created_at: expect.any(String),
+						article_img_url:
+							'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+						votes: 50,
+					});
+				});
+		});
+		test('PATCH 400: responds with a 400 error if passed data in the wrong format', () => {
+			const votes = { garbageVotes: 50 };
+			return request(app)
+				.patch('/api/articles/3')
+				.send(votes)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Invalid input format');
+				});
+		});
+		//Could this also be/would be better off as a 422?
+		test('PATCH 400: responds with a 400 error if passed invalid data', () => {
+			const votes = { inc_votes: 'sixty' };
+			return request(app)
+				.patch('/api/articles/3')
+				.send(votes)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
+		test('PATCH 404: responds with a 404 error if given a valid but non-existent article id', () => {
+			const votes = { inc_votes: 100 };
+			return request(app)
+				.patch('/api/articles/100')
+				.send(votes)
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Article not found');
+				});
+		});
+		test('PATCH 400: responds with a 400 error if given an invalid article id', () => {
+			const votes = { inc_votes: 100 };
+			return request(app)
+				.patch('/api/articles/garbage')
+				.send(votes)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
 	});
 });
 
 describe('/api/articles', () => {
-	test('GET 200: responds with an array of all articles without the body property and with a comment count', () => {
-		return request(app)
-			.get('/api/articles')
-			.expect(200)
-			.then(({ body }) => {
-				const { articles } = body;
+	describe('GET /api/articles', () => {
+		test('GET 200: responds with an array of all articles without the body property and with a comment count', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
 
-				expect(articles.length).toBe(13);
-				articles.forEach((article) => {
-					expect(article).toMatchObject({
-						author: expect.any(String),
-						title: expect.any(String),
-						article_id: expect.any(Number),
-						topic: expect.any(String),
-						created_at: expect.any(String),
-						article_img_url: expect.any(String),
-						votes: expect.any(Number),
-						comment_count: expect.any(Number),
+					expect(articles.length).toBe(13);
+					articles.forEach((article) => {
+						expect(article).toMatchObject({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							created_at: expect.any(String),
+							article_img_url: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						});
 					});
 				});
-			});
-	});
-	test('GET 200: responds with articles sorted by date in descending order as a default', () => {
-		return request(app)
-			.get('/api/articles')
-			.expect(200)
-			.then(({ body }) => {
-				const { articles } = body;
-				expect(articles).toBeSortedBy('created_at', { descending: true });
-			});
+		});
+		test('GET 200: responds with articles sorted by date in descending order as a default', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles).toBeSortedBy('created_at', { descending: true });
+				});
+		});
 	});
 });
 
