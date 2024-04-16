@@ -4,6 +4,7 @@ const db = require('../db/connection');
 const seed = require('../db/seeds/seed');
 const data = require('../db/data/test-data/index');
 const endpoints = require('../endpoints');
+const comments = require('../db/data/test-data/comments');
 
 afterAll(() => {
 	db.end();
@@ -125,67 +126,118 @@ describe('/api/articles', () => {
 });
 
 describe('/api/articles/:article_id/comments', () => {
-	test('GET 200: responds with an array of comments with the associated article id', () => {
-		return request(app)
-			.get('/api/articles/3/comments')
-			.expect(200)
-			.then(({ body }) => {
-				const { comments } = body;
-				expect(comments).toEqual([
-					{
-						comment_id: 11,
-						body: 'Ambidextrous marsupial',
+	describe('GET', () => {
+		test('GET 200: responds with an array of comments with the associated article id', () => {
+			return request(app)
+				.get('/api/articles/3/comments')
+				.expect(200)
+				.then(({ body }) => {
+					const { comments } = body;
+					expect(comments).toEqual([
+						{
+							comment_id: 11,
+							body: 'Ambidextrous marsupial',
+							article_id: 3,
+							author: 'icellusedkars',
+							votes: 0,
+							created_at: expect.any(String),
+						},
+						{
+							comment_id: 10,
+							body: 'git push origin master',
+							article_id: 3,
+							author: 'icellusedkars',
+							votes: 0,
+							created_at: expect.any(String),
+						},
+					]);
+				});
+		});
+
+		test('GET 200: responds with an array of comments ordered by created_at in descending order', () => {
+			return request(app)
+				.get('/api/articles/1/comments')
+				.expect(200)
+				.then(({ body }) => {
+					const { comments } = body;
+					expect(comments).toBeSortedBy('created_at', { descending: true });
+				});
+		});
+
+		test('GET 200: responds with an empty array when an existing article has no comments', () => {
+			return request(app)
+				.get('/api/articles/2/comments')
+				.expect(200)
+				.then(({ body }) => {
+					expect(body).toEqual({ comments: [] });
+				});
+		});
+
+		test('GET 404: responds with a 404 error if given a valid but non-existent id', () => {
+			return request(app)
+				.get('/api/articles/180/comments')
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toEqual('Article not found');
+				});
+		});
+
+		test('GET 400: responds with a 400 error if invalid article id is given', () => {
+			return request(app)
+				.get('/api/articles/garbage/comments')
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toEqual('Bad request');
+				});
+		});
+	});
+
+	describe('POST', () => {
+		test('POST 201: posts a new comment and returns the comment with an id', () => {
+			const comment = {
+				username: 'butter_bridge',
+				body: 'Wow I totally agree!',
+			};
+			return request(app)
+				.post('/api/articles/3/comments')
+				.send(comment)
+				.expect(201)
+				.then(({ body }) => {
+					expect(body.comment).toEqual({
+						comment_id: 19,
+						author: 'butter_bridge',
+						body: 'Wow I totally agree!',
 						article_id: 3,
-						author: 'icellusedkars',
 						votes: 0,
 						created_at: expect.any(String),
-					},
-					{
-						comment_id: 10,
-						body: 'git push origin master',
-						article_id: 3,
-						author: 'icellusedkars',
-						votes: 0,
-						created_at: expect.any(String),
-					},
-				]);
-			});
-	});
-
-	test('GET 200: responds with an array of comments ordered by created_at in descending order', () => {
-		return request(app)
-			.get('/api/articles/1/comments')
-			.expect(200)
-			.then(({ body }) => {
-				const { comments } = body;
-				expect(comments).toBeSortedBy('created_at', { descending: true });
-			});
-	});
-
-	test('GET 200: responds with an empty array when an existing article has no comments', () => {
-		return request(app)
-			.get('/api/articles/2/comments')
-			.expect(200)
-			.then(({ body }) => {
-				expect(body).toEqual({ comments: [] });
-			});
-	});
-
-	test('GET 404: responds with a 404 error if given a valid but non-existent id', () => {
-		return request(app)
-			.get('/api/articles/180/comments')
-			.expect(404)
-			.then(({ body }) => {
-				expect(body.msg).toEqual('Article not found');
-			});
-	});
-
-	test('GET 400: responds with a 400 error if invalid article id is given', () => {
-		return request(app)
-			.get('/api/articles/garbage/comments')
-			.expect(400)
-			.then(({ body }) => {
-				expect(body.msg).toEqual('Bad request');
-			});
+					});
+				});
+		});
+		test('POST 404: throws a 404 error when given a valid but non-existent article id', () => {
+			const comment = {
+				username: 'butter_bridge',
+				body: 'Wow I totally agree!',
+			};
+			return request(app)
+				.post('/api/articles/101/comments')
+				.send(comment)
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toEqual('Article not found');
+				});
+		});
+		test('POST 400: throws a 400 error when given an invalid article id',() => {
+			const comment = {
+				username: 'butter_bridge',
+				body: 'Wow I totally agree!',
+			};
+			return request(app)
+				.post('/api/articles/garbage/comments')
+				.send(comment)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toEqual('Bad request');
+				})
+		})
 	});
 });

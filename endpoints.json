@@ -66,5 +66,23 @@
 				}
 			]
 		}
+	},
+	"POST /api/articles/:article_id/comments": {
+		"description": "posts a new comment to the comment table, serving the posted comment",
+		"queries": [],
+		"example post": {
+			"username": "butter_bridge",
+			"body": "Wow I totally agree!"
+		},
+		"exampleResponse": {
+			"comment": {
+				"comment_id": 19,
+				"author": "butter_bridge",
+				"body": "Wow I totally agree!",
+				"article_id": 3,
+				"votes": 0,
+				"created_at": "2021-05-30T19:36:16.341Z"
+			}
+		}
 	}
 }
