@@ -51,7 +51,7 @@ describe('/api', () => {
 	});
 });
 
-describe('/api/articles/:article_id', () => {
+describe.only('/api/articles/:article_id', () => {
 	describe('GET /api/articles/:article_id', () => {
 		test('GET 200: Responds with the article that corresponds with the given article id', () => {
 			return request(app)
@@ -59,17 +59,16 @@ describe('/api/articles/:article_id', () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { article } = body;
-					expect(article.article_id).toEqual(2);
-					expect(article.title).toEqual('Sony Vaio; or, The Laptop');
-					expect(article.topic).toEqual('mitch');
-					expect(article.author).toEqual('icellusedkars');
-					expect(article.body).toEqual(
-						'Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.'
-					);
-					expect(typeof article.created_at).toEqual('string');
-					expect(article.article_img_url).toEqual(
-						'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
-					);
+					
+					expect(article).toMatchObject({
+						article_id: 2,
+						title: 'Sony Vaio; or, The Laptop',
+						topic: 'mitch',
+						author: 'icellusedkars',
+						body: 'Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.',
+						created_at: expect.any(String),
+						article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+					});
 				});
 		});
 		test('GET 404: responds with a 404 error when valid but non-existent id is given', () => {
@@ -155,7 +154,7 @@ describe('/api/articles/:article_id', () => {
 	});
 });
 
-describe.only('/api/articles', () => {
+describe('/api/articles', () => {
 	describe('GET /api/articles', () => {
 		test('GET 200: responds with an array of all articles without the body property and with a comment count', () => {
 			return request(app)
