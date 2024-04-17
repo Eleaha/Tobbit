@@ -1,4 +1,4 @@
-# News application
+# Tobbit
 <https://tobbit.onrender.com/api>
 
 A lightweight article based news application.
