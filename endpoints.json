@@ -55,7 +55,8 @@
 				"author": "icellusedkars",
 				"body": "Text from the article..",
 				"created_at": "2018-05-30T15:59:13.341Z",
-				"article_img_url": "image from the article..."
+				"article_img_url": "image from the article...",
+				"comment_count" : 20
 			}
 		}
 	},
@@ -118,8 +119,7 @@
 			}
 		}
 	},
-	"DELETE /api/comments/:comment_id" : {
+	"DELETE /api/comments/:comment_id": {
 		"description": "deletes the comment with the associated id given and responds with the status code only"
 	}
-
 }

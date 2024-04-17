@@ -2,7 +2,15 @@ const db = require('../db/connection');
 
 function fetchArticleById(id) {
 	return db
-		.query('SELECT * FROM articles WHERE article_id=$1', [id])
+		.query(
+			`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, articles.body, COUNT(comments.article_id)::INT AS comment_count 
+			FROM articles
+			LEFT JOIN comments
+			ON comments.article_id = articles.article_id
+			WHERE articles.article_id=$1
+			GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, articles.body;`,
+			[id]
+		)
 		.then(({ rows }) => {
 			if (!rows.length) {
 				return Promise.reject({ status: 404, msg: 'Article not found' });
@@ -14,9 +22,9 @@ function fetchArticleById(id) {
 function fetchArticles(topic) {
 	let dbQuery = `SELECT 
             articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, 
-            CAST(COALESCE(SUM(comments.votes), 0) AS INTEGER) 
+            COALESCE(SUM(comments.votes), 0)::INT
             AS votes, 
-            CAST(COUNT(comments.article_id) AS INTEGER) 
+            COUNT(comments.article_id)::INT
             AS comment_count 
             FROM articles
             LEFT JOIN comments 
