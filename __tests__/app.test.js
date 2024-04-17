@@ -155,7 +155,7 @@ describe('/api/articles/:article_id', () => {
 	});
 });
 
-describe('/api/articles', () => {
+describe.only('/api/articles', () => {
 	describe('GET /api/articles', () => {
 		test('GET 200: responds with an array of all articles without the body property and with a comment count', () => {
 			return request(app)
@@ -188,6 +188,47 @@ describe('/api/articles', () => {
 					expect(articles).toBeSortedBy('created_at', { descending: true });
 				});
 		});
+	});
+
+	describe.only('GET /api/articles?topic', () => {
+		test('GET 200 topic? : responds with an array of objects with the topic specified in the topic query', () => {
+			return request(app)
+				.get('/api/articles?topic=mitch')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles.length).toBe(12);
+					articles.forEach((article) => {
+						expect(article).toMatchObject({
+							article_id: expect.any(Number),
+							author: expect.any(String),
+							title: expect.any(String),
+							topic: 'mitch',
+							created_at: expect.any(String),
+							article_img_url: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						});
+					});
+				});
+		});
+		test('GET 404: throws a 404 error if the topic queries does not exist', () => {
+			return request(app)
+				.get('/api/articles?topic=garbage')
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Not found');
+				});
+
+		});
+		test('GET 200: returns an empty array if the topic exists with no associated articles', () => {
+			return request(app)
+				.get('/api/articles?topic=paper')
+				.expect(200)
+				.then(({ body }) => {
+					expect(body.articles).toEqual([])
+				});
+		})
 	});
 });
 

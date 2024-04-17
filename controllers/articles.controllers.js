@@ -3,6 +3,7 @@ const {
 	fetchArticles,
 	updateVotesById
 } = require('../models/articles.models');
+const {checkTopicExists} = require('../models/topics.models')
 
 function getArticleById(req, res, next) {
 	const { article_id } = req.params;
@@ -14,9 +15,13 @@ function getArticleById(req, res, next) {
 }
 
 function getArticles(req, res, next) {
-	return fetchArticles().then((articles) => {
+	const {topic} = req.query
+
+	return Promise.all([fetchArticles(topic), checkTopicExists(topic)])
+	.then(([articles]) => {
 		res.status(200).send({ articles });
-	});
+	})
+	.catch(next)
 }
 
 function patchArticleById(req, res, next){
