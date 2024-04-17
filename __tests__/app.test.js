@@ -51,15 +51,15 @@ describe('/api', () => {
 	});
 });
 
-describe.only('/api/articles/:article_id', () => {
-	describe('GET /api/articles/:article_id', () => {
+describe('/api/articles/:article_id', () => {
+	describe.only('GET /api/articles/:article_id', () => {
 		test('GET 200: Responds with the article that corresponds with the given article id', () => {
 			return request(app)
 				.get('/api/articles/2')
 				.expect(200)
 				.then(({ body }) => {
 					const { article } = body;
-					
+
 					expect(article).toMatchObject({
 						article_id: 2,
 						title: 'Sony Vaio; or, The Laptop',
@@ -67,7 +67,27 @@ describe.only('/api/articles/:article_id', () => {
 						author: 'icellusedkars',
 						body: 'Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.',
 						created_at: expect.any(String),
-						article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+						article_img_url:
+							'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+					});
+				});
+		});
+		test('GET 200: adds comment_count to the return object', () => {
+			return request(app)
+				.get('/api/articles/1')
+				.expect(200)
+				.then(({ body }) => {
+					const { article } = body;
+					expect(article).toMatchObject({
+						article_id: 1,
+						title: 'Living in the shadow of a great man',
+						topic: 'mitch',
+						author: 'butter_bridge',
+						body: 'I find this existence challenging',
+						created_at: expect.any(String),
+						article_img_url:
+							'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+						comment_count: 11,
 					});
 				});
 		});
@@ -189,7 +209,7 @@ describe('/api/articles', () => {
 		});
 	});
 
-	describe.only('GET /api/articles?topic', () => {
+	describe('GET /api/articles?topic', () => {
 		test('GET 200 topic? : responds with an array of objects with the topic specified in the topic query', () => {
 			return request(app)
 				.get('/api/articles?topic=mitch')
@@ -218,16 +238,15 @@ describe('/api/articles', () => {
 				.then(({ body }) => {
 					expect(body.msg).toBe('Not found');
 				});
-
 		});
 		test('GET 200: returns an empty array if the topic exists with no associated articles', () => {
 			return request(app)
 				.get('/api/articles?topic=paper')
 				.expect(200)
 				.then(({ body }) => {
-					expect(body.articles).toEqual([])
+					expect(body.articles).toEqual([]);
 				});
-		})
+		});
 	});
 });
 
