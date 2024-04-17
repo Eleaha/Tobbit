@@ -122,7 +122,6 @@ describe('/api/articles/:article_id', () => {
 					expect(body.msg).toBe('Invalid input format');
 				});
 		});
-		//Could this also be/would be better off as a 422?
 		test('PATCH 400: responds with a 400 error if passed invalid data', () => {
 			const votes = { inc_votes: 'sixty' };
 			return request(app)
@@ -336,12 +335,33 @@ describe('/api/comments/:comment_id', () => {
 					expect(body.msg).toBe('Comment id not found');
 				});
 		});
-		test.only('DELETE 400: responds with a 400 error when given an invalid id', () => {
+		test('DELETE 400: responds with a 400 error when given an invalid id', () => {
 			return request(app)
 				.delete('/api/comments/garbage')
 				.expect(400)
 				.then(({ body }) => {
 					expect(body.msg).toBe('Bad request');
+				});
+		});
+	});
+});
+
+describe('/api/users', () => {
+	describe('GET /api/users', () => {
+		test('GET 200: responds with an array of user objects', () => {
+			return request(app)
+				.get('/api/users')
+				.expect(200)
+				.then(({ body }) => {
+					const { users } = body;
+					expect(users.length).toBe(4);
+					users.forEach((user) => {
+						expect(user).toMatchObject({
+							username: expect.any(String),
+							name: expect.any(String),
+							avatar_url: expect.any(String),
+						});
+					});
 				});
 		});
 	});

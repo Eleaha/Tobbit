@@ -26,6 +26,24 @@
 			]
 		}
 	},
+	"GET /api/users": {
+		"description": "serves an array of all users including the username, name and avatar_url",
+		"queries": [],
+		"exampleResponse": {
+			"users": [
+				{
+					"username": "butter_bridge",
+					"name": "jonny",
+					"avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+				},
+				{
+					"username": "icellusedkars",
+					"name": "sam",
+					"avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+				}
+			]
+		}
+	},
 	"GET /api/articles/:article_id": {
 		"description": "serves an object containing the article with the corresponding id",
 		"queries": [],
@@ -101,6 +119,7 @@
 		}
 	},
 	"DELETE /api/comments/:comment_id" : {
-		"description": "deletes the comment with the associated id given"
+		"description": "deletes the comment with the associated id given and responds with the status code only"
 	}
+
 }
