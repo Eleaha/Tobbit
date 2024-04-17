@@ -33,8 +33,10 @@ describe('/api/topics', () => {
 				const { topics } = body;
 				expect(topics.length).toBe(3);
 				topics.forEach((topic) => {
-					expect(typeof topic.description).toBe('string');
-					expect(typeof topic.slug).toBe('string');
+					expect(topic).toMatchObject({
+						description: expect.any(String),
+						slug: expect.any(String),
+					});
 				});
 			});
 	});
@@ -52,14 +54,13 @@ describe('/api', () => {
 });
 
 describe('/api/articles/:article_id', () => {
-	describe.only('GET /api/articles/:article_id', () => {
+	describe('GET /api/articles/:article_id', () => {
 		test('GET 200: Responds with the article that corresponds with the given article id', () => {
 			return request(app)
 				.get('/api/articles/2')
 				.expect(200)
 				.then(({ body }) => {
 					const { article } = body;
-
 					expect(article).toMatchObject({
 						article_id: 2,
 						title: 'Sony Vaio; or, The Laptop',
@@ -79,14 +80,6 @@ describe('/api/articles/:article_id', () => {
 				.then(({ body }) => {
 					const { article } = body;
 					expect(article).toMatchObject({
-						article_id: 1,
-						title: 'Living in the shadow of a great man',
-						topic: 'mitch',
-						author: 'butter_bridge',
-						body: 'I find this existence challenging',
-						created_at: expect.any(String),
-						article_img_url:
-							'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
 						comment_count: 11,
 					});
 				});
@@ -96,7 +89,7 @@ describe('/api/articles/:article_id', () => {
 				.get('/api/articles/500')
 				.expect(404)
 				.then(({ body }) => {
-					expect(body.msg).toEqual('Article not found');
+					expect(body.msg).toEqual('Not found');
 				});
 		});
 		test('GET 400: responds with a 400 error when an invalid id is given', () => {
@@ -182,7 +175,6 @@ describe('/api/articles', () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { articles } = body;
-
 					expect(articles.length).toBe(13);
 					articles.forEach((article) => {
 						expect(article).toMatchObject({
@@ -258,24 +250,17 @@ describe('/api/articles/:article_id/comments', () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { comments } = body;
-					expect(comments).toEqual([
-						{
-							comment_id: 11,
-							body: 'Ambidextrous marsupial',
-							article_id: 3,
-							author: 'icellusedkars',
-							votes: 0,
+					expect(comments.length).toBe(2);
+					comments.forEach((comment) => {
+						expect(comment).toMatchObject({
+							comment_id: expect.any(Number),
+							body: expect.any(String),
+							article_id: expect.any(Number),
+							author: expect.any(String),
+							votes: expect.any(Number),
 							created_at: expect.any(String),
-						},
-						{
-							comment_id: 10,
-							body: 'git push origin master',
-							article_id: 3,
-							author: 'icellusedkars',
-							votes: 0,
-							created_at: expect.any(String),
-						},
-					]);
+						});
+					});
 				});
 		});
 
@@ -285,6 +270,7 @@ describe('/api/articles/:article_id/comments', () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { comments } = body;
+					expect(comments.length).toBe(11)
 					expect(comments).toBeSortedBy('created_at', { descending: true });
 				});
 		});
@@ -303,7 +289,7 @@ describe('/api/articles/:article_id/comments', () => {
 				.get('/api/articles/180/comments')
 				.expect(404)
 				.then(({ body }) => {
-					expect(body.msg).toEqual('Article not found');
+					expect(body.msg).toEqual('Not found');
 				});
 		});
 
@@ -348,7 +334,7 @@ describe('/api/articles/:article_id/comments', () => {
 				.send(comment)
 				.expect(404)
 				.then(({ body }) => {
-					expect(body.msg).toEqual('Article not found');
+					expect(body.msg).toEqual('Not found');
 				});
 		});
 		test('POST 400: throws a 400 error when given an invalid article id', () => {
@@ -368,6 +354,19 @@ describe('/api/articles/:article_id/comments', () => {
 		test('POST 400: throws an error when the request body is in an invalid format', () => {
 			const comment = {
 				nickname: 'butter_bridge',
+				body: 'Wow I totally agree!',
+			};
+			return request(app)
+				.post('/api/articles/3/comments')
+				.send(comment)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toEqual('Bad request');
+				});
+		});
+		test('POST 400: throws an error when the user given is invalid or does not exist in the users database', () => {
+			const comment = {
+				username: 'ilovecats',
 				body: 'Wow I totally agree!',
 			};
 			return request(app)

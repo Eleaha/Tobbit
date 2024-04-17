@@ -27,7 +27,7 @@ function postCommentByArticleId(req, res, next) {
 		res.status(400).send({ msg: 'Bad request' });
 	} else {
 		commentToPost.article_id = +id;
-		return checkArticleExists(id)
+		checkArticleExists(id)
 			.then(() => {
 				return insertCommentByArticleId(commentToPost);
 			})

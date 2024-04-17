@@ -13,7 +13,7 @@ function fetchArticleById(id) {
 		)
 		.then(({ rows }) => {
 			if (!rows.length) {
-				return Promise.reject({ status: 404, msg: 'Article not found' });
+				return Promise.reject({ status: 404, msg: 'Not found' });
 			}
 			return rows[0];
 		});
@@ -30,7 +30,7 @@ function fetchArticles(topic) {
             LEFT JOIN comments 
             ON comments.article_id = articles.article_id`;
 
-	let queryValues = [];
+	const queryValues = [];
 
 	if (topic) {
 		dbQuery += ` WHERE topic=$1`;
