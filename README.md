@@ -1,7 +1,7 @@
 # News application
 <https://tobbit.onrender.com/api>
 
-A lightweight article based backend news application.
+A lightweight article based news application.
 
 
 ## Commands
