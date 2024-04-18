@@ -240,6 +240,53 @@ describe('/api/articles', () => {
 				});
 		});
 	});
+
+	describe('GET /api/articles?sort_by=*', () => {
+		test('GET 200: responds with articles ordered by given sort query', () => {
+			return request(app)
+				.get('/api/articles?sort_by=title')
+				.expect(200)
+				.then(({ body }) => {
+					expect(body.articles).toBeSortedBy('title', { descending: true });
+				});
+		});
+		test('GET 400: responds with a 400 error if given an invalid column to sort by', () => {
+			return request(app)
+				.get('/api/articles?sort_by=garbage')
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Invalid query');
+				});
+		});
+	});
+	describe('GET /api/articles?order=*', () => {
+		test('GET 200: responds with articles ordered by given order value', () => {
+			return request(app)
+				.get('/api/articles?order=asc')
+				.expect(200)
+				.then(({ body }) => {
+					expect(body.articles).toBeSortedBy('created_at');
+				});
+		});
+		test('GET 400: responds with 400 if given an invalid order value', () => {
+			return request(app)
+				.get('/api/articles?order=garbage')
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Invalid query');
+				});
+		});
+	});
+	describe('GET /api/articles?query1=*/query2=* etc', () => {
+		test('GET 400: throws a 400 error if given an invalid query', () => {
+			return request(app)
+				.get('/api/articles?garbage=garbage')
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Invalid query');
+				});
+		});
+	});
 });
 
 describe('/api/articles/:article_id/comments', () => {
@@ -270,7 +317,7 @@ describe('/api/articles/:article_id/comments', () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { comments } = body;
-					expect(comments.length).toBe(11)
+					expect(comments.length).toBe(11);
 					expect(comments).toBeSortedBy('created_at', { descending: true });
 				});
 		});
