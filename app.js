@@ -1,30 +1,18 @@
 const express = require('express');
 const { getTopics } = require('./controllers/topics.controllers');
-const {
-	getArticleById,
-	getArticles,
-	patchArticleById,
-} = require('./controllers/articles.controllers');
-const {
-	getCommentsByArticleId,
-	postCommentByArticleId,
-	deleteCommentById,
-} = require('./controllers/comments.controllers');
-const { getUsers } = require('./controllers/users.controllers');
-const {apiRouter} = require('./routes/api-router')
-const { articlesRouter } = require('./routes/articles-router');
+const {	deleteCommentById } = require('./controllers/comments.controllers');
+
+const {apiRouter, articlesRouter, usersRouter} = require('./routes/routes.index')
 
 const app = express();
 
 app.use(express.json());
 
 app.use('/api', apiRouter);
-
 app.use('/api/articles', articlesRouter)
+app.use('/api/users', usersRouter)
 
 app.get('/api/topics', getTopics);
-
-app.get('/api/users', getUsers);
 
 app.delete('/api/comments/:comment_id', deleteCommentById);
 
