@@ -26,6 +26,29 @@
 			]
 		}
 	},
+	"POST /api/articles": {
+		"description": "posts a new article, serving the posted article",
+		"queries": [],
+		"example post": {
+			"author": "butter_bridge",
+			"title": "I love cats!",
+			"body": "I just think they're really neat",
+			"topic": "cats"
+		},
+		"exampleResponse": {
+			"newArticle": {
+				"article_id": 6,
+				"author": "butter_bridge",
+				"title": "I love cats!",
+				"body": "I just think they're really neat",
+				"topic": "cats",
+				"article_img_url": "url",
+				"votes": 0,
+				"created_at": "2018-05-30T15:59:13.341Z",
+				"comment_count": 0
+			}
+		}
+	},
 	"GET /api/users": {
 		"description": "serves an array of all users including the username, name and avatar_url",
 		"queries": [],

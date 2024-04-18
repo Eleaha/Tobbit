@@ -98,9 +98,25 @@ function updateVotesById(id, votes) {
 		});
 }
 
+function insertArticle(article){
+
+	const queryValues = Object.values(article)
+
+	return db.query(
+		`INSERT INTO articles(author, title, body, topic)
+		VALUES($1, $2, $3, $4)
+		RETURNING *`,
+		queryValues
+	).then(({ rows }) => {
+		rows[0].comment_count = 0
+		return rows[0]
+	});
+}
+
 module.exports = {
 	fetchArticleById,
 	fetchArticles,
 	checkArticleExists,
 	updateVotesById,
+	insertArticle
 };

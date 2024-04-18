@@ -201,6 +201,77 @@ describe('/api/articles', () => {
 		});
 	});
 
+	describe('POST /api/articles', () => {
+		test('POST 201: Responds with the posted article', () => {
+			const postBody = {
+				author: 'rogersop',
+				title: 'Toby is my cat',
+				body: 'Toby is a dignified little gentleman, with bald lips and a short backleg.',
+				topic: 'cats',
+			};
+			return request(app)
+				.post('/api/articles')
+				.send(postBody)
+				.expect(201)
+				.then(({ body }) => {
+					const { newArticle } = body;
+					expect(newArticle).toMatchObject({
+						author: 'rogersop',
+						title: 'Toby is my cat',
+						body: 'Toby is a dignified little gentleman, with bald lips and a short backleg.',
+						topic: 'cats',
+						article_id: 14,
+						votes: 0,
+						created_at: expect.any(String),
+						comment_count: 0,
+					});
+				});
+		});
+		test('POST 400: throws a 400 error when given an invalid object', () => {
+			const postBody = {
+				author: 'rogersop',
+				body: 'Toby is a dignified little gentleman, with bald lips and a short backleg.',
+			};
+			return request(app)
+				.post('/api/articles')
+				.send(postBody)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
+		test("POST 400: throws a 400 error when given an author that doesn't exist", () => {
+			const postBody = {
+				author: 'Ilovecats',
+				title: 'Toby is my cat',
+				body: 'Toby is a dignified little gentleman, with bald lips and a short backleg.',
+				topic: 'cats',
+			};
+			return request(app)
+				.post('/api/articles')
+				.send(postBody)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
+		test("POST 400: throws a 400 error when given a author that doesn't exist", () => {
+			const postBody = {
+				author: 'rogersop',
+				title: 'Toby is my cat',
+				body: 'Toby is a dignified little gentleman, with bald lips and a short backleg.',
+				topic: 'garbage',
+			};
+			return request(app)
+				.post('/api/articles')
+				.send(postBody)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
+	});
+
 	describe('GET /api/articles?topic', () => {
 		test('GET 200 topic? : responds with an array of objects with the topic specified in the topic query', () => {
 			return request(app)

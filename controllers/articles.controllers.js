@@ -2,7 +2,9 @@ const {
 	fetchArticleById,
 	fetchArticles,
 	updateVotesById,
+	insertArticle,
 } = require('../models/articles.models');
+
 const { checkTopicExists } = require('../models/topics.models');
 
 function getArticleById(req, res, next) {
@@ -44,4 +46,13 @@ function patchArticleById(req, res, next) {
 		.catch(next);
 }
 
-module.exports = { getArticleById, getArticles, patchArticleById };
+function postArticle(req, res, next) {
+	const articleBody = req.body;
+
+	insertArticle(articleBody).then((newArticle) => {
+		res.status(201).send({ newArticle });
+	})
+	.catch(next)
+}
+
+module.exports = { getArticleById, getArticles, patchArticleById, postArticle };
