@@ -2,6 +2,7 @@ const {
 	fetchCommentsByArticleId,
 	insertCommentByArticleId,
 	removeCommentById,
+	updateCommentVotesById,
 } = require('../models/comments.models');
 const { checkArticleExists } = require('../models/articles.models');
 
@@ -47,8 +48,19 @@ function deleteCommentById(req, res, next){
 
 }
 
+function patchCommentById(req, res, next){
+	const id = req.params.comment_id
+	const votes = req.body.inc_votes
+
+	updateCommentVotesById(id, votes).then((comment) => {
+		res.status(200).send({comment})
+	})
+	.catch(next)
+}
+
 module.exports = {
 	getCommentsByArticleId,
 	postCommentByArticleId,
 	deleteCommentById,
+	patchCommentById
 };

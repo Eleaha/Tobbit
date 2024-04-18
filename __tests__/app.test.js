@@ -449,6 +449,57 @@ describe('/api/comments/:comment_id', () => {
 				});
 		});
 	});
+
+	describe('PATCH /api/comments/:comment_id', () => {
+		test('PATCH 200: responds with the updated comment object', () => {
+			const patchObj = { inc_votes: 27 };
+			return request(app)
+				.patch('/api/comments/7')
+				.send(patchObj)
+				.expect(200)
+				.then(({ body }) => {
+					const { comment } = body;
+					expect(comment).toMatchObject({
+						comment_id: 7,
+						body: 'Lobster pot',
+						votes: 27,
+						author: 'icellusedkars',
+						article_id: 1,
+						created_at: expect.any(String),
+					});
+				});
+		});
+		test('PATCH 404: responds with a 404 is a comment id is not found', () => {
+			const patchObj = { inc_votes: 27 };
+			return request(app)
+				.patch('/api/comments/180')
+				.send(patchObj)
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Not found');
+				});
+		});
+		test('PATCH 400: Invalid format for vote request object', () => {
+			const patchObj = { garbage: 27 };
+			return request(app)
+				.patch('/api/comments/7')
+				.send(patchObj)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Invalid input format');
+				});
+		});
+		test('PATCH 400: Invalid data type', () => {
+			const patchObj = { inc_votes: 'garbage' };
+			return request(app)
+				.patch('/api/comments/7')
+				.send(patchObj)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
+	});
 });
 
 describe('/api/users', () => {
@@ -473,26 +524,28 @@ describe('/api/users', () => {
 });
 
 describe('/api/users/:username', () => {
-	test('GET 200: responds with the user with the corresponding username', () => {
-		return request(app)
-			.get('/api/users/rogersop')
-			.expect(200)
-			.then(({ body }) => {
-				const { user } = body;
-				expect(user).toMatchObject({
-					username: 'rogersop',
-					name: 'paul',
-					avatar_url:
-						'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4',
+	describe('GET /api/uses/:username', () => {
+		test('GET 200: responds with the user with the corresponding username', () => {
+			return request(app)
+				.get('/api/users/rogersop')
+				.expect(200)
+				.then(({ body }) => {
+					const { user } = body;
+					expect(user).toMatchObject({
+						username: 'rogersop',
+						name: 'paul',
+						avatar_url:
+							'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4',
+					});
 				});
-			});
-	});
-	test("GET 404: responds with a 404 for a user that doesn't exist", () => {
-		return request(app)
-			.get('/api/users/ilovecats')
-			.expect(404)
-			.then(({ body }) => {
-				expect(body.msg).toBe('User not found');
-			});
+		});
+		test("GET 404: responds with a 404 for a user that doesn't exist", () => {
+			return request(app)
+				.get('/api/users/ilovecats')
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe('User not found');
+				});
+		});
 	});
 });
