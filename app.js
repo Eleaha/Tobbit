@@ -1,8 +1,7 @@
 const express = require('express');
 const { getTopics } = require('./controllers/topics.controllers');
-const {	deleteCommentById } = require('./controllers/comments.controllers');
 
-const {apiRouter, articlesRouter, usersRouter} = require('./routes/routes.index')
+const {apiRouter, articlesRouter, usersRouter, commentsRouter} = require('./routes/routes.index')
 
 const app = express();
 
@@ -11,10 +10,9 @@ app.use(express.json());
 app.use('/api', apiRouter);
 app.use('/api/articles', articlesRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/comments', commentsRouter)
 
 app.get('/api/topics', getTopics);
-
-app.delete('/api/comments/:comment_id', deleteCommentById);
 
 
 app.all('*', (req, res, next) => {
