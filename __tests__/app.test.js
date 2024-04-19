@@ -40,6 +40,38 @@ describe('/api/topics', () => {
 				});
 			});
 	});
+	describe('POST /api/topics', () => {
+		test('POST 201: responds with the newly created topic object', () => {
+			const postBody = {
+				slug: 'foccacia',
+				description: 'all about tasty italian bread',
+			};
+			return request(app)
+				.post('/api/topics')
+				.send(postBody)
+				.expect(201)
+				.then(({ body }) => {
+					const { newTopic } = body;
+					expect(newTopic).toMatchObject({
+						slug: 'foccacia',
+						description: 'all about tasty italian bread',
+					});
+				});
+		});
+		test('POST 400: invalid post object format', () => {
+			const postBody = {
+				slug: 'foccacia',
+				garbage: 'all about tasty italian bread',
+			};
+			return request(app)
+				.post('/api/topics')
+				.send(postBody)
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
+	});
 });
 
 describe('/api', () => {
@@ -196,7 +228,7 @@ describe('/api/articles', () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { articles } = body;
-					expect(articles.length).toBe(10)
+					expect(articles.length).toBe(10);
 					expect(articles).toBeSortedBy('created_at', { descending: true });
 				});
 		});
@@ -475,7 +507,7 @@ describe('/api/articles', () => {
 				.then(({ body }) => {
 					expect(body.msg).toBe('Bad request');
 				});
-		})
+		});
 	});
 
 	describe('GET /api/articles?query1=*/query2=* etc', () => {

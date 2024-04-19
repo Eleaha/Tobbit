@@ -85,7 +85,6 @@ function fetchArticles(
 		if (offset > rows.length) {
 			return Promise.reject({ status: 404, msg: 'Not found' });
 		}
-
 		return rows;
 	});
 }

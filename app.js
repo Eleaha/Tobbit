@@ -6,6 +6,7 @@ const {
 	articlesRouter,
 	usersRouter,
 	commentsRouter,
+	topicsRouter,
 } = require('./routes/routes.index');
 
 const app = express();
@@ -16,16 +17,13 @@ app.use('/api', apiRouter);
 app.use('/api/articles', articlesRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/comments', commentsRouter);
-
-app.get('/api/topics', getTopics);
+app.use('/api/topics', topicsRouter);
 
 app.all('*', (req, res, next) => {
 	res.status(404).send({ msg: 'Not found' });
 });
 
 app.use((err, req, res, next) => {
-	
-	// console.log(err)
 
 	if (err.status && err.msg) {
 		res.status(err.status).send({ msg: err.msg });
