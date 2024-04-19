@@ -1,3 +1,4 @@
+const { promises } = require('supertest/lib/test');
 const db = require('../db/connection');
 
 function fetchTopics() {
@@ -21,4 +22,27 @@ function checkTopicExists(topic) {
 	}
 }
 
-module.exports = { fetchTopics, checkTopicExists };
+function insertTopic(topic) {
+	const topicValues = Object.values(topic);
+
+	const validKeys = ['slug', 'description'];
+
+	if (JSON.stringify(validKeys) !== JSON.stringify(Object.keys(topic))) {
+		return Promise.reject({status: 400, msg: 'Bad request' });
+	} else {
+
+		return db
+			.query(
+				`INSERT INTO topics (slug, description)
+				VALUES ($1, $2)
+				RETURNING *`,
+				topicValues
+			)
+			.then(({ rows }) => {
+				console.log(rows, 'model')
+				return rows[0];
+			});
+	}
+}
+
+module.exports = { fetchTopics, checkTopicExists, insertTopic };

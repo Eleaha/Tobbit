@@ -9,6 +9,15 @@
 			"topics": [{ "slug": "football", "description": "Footie!" }]
 		}
 	},
+	"POST /api/topics": {
+		"description": "Posts new topic, serving the new topic back",
+		"queries": [],
+		"examplePost": {
+			"topics": [{ "slug": "football", "description": "Footie!" }]
+		},
+		"exampleResponse": {
+			"topics": [{ "slug": "football", "description": "Footie!" }]
+	},
 	"GET /api/articles": {
 		"description": "serves an array of articles paginated (use p to navigate pages, and limit for entries per page), including the vote count and comment count.",
 		"queries": ["author", "topic", "sort_by", "order", "limit", "p"],
