@@ -17,18 +17,19 @@ function getArticleById(req, res, next) {
 }
 
 function getArticles(req, res, next) {
-	const validQueries = ['topic', 'sort_by', 'order'];
+	const validQueries = ['topic', 'sort_by', 'order', 'limit', 'p'];
 
 	const isValidQuery = Object.keys(req.query).every((query) =>
 		validQueries.includes(query)
 	);
+	
 	if (!isValidQuery) {
 		res.status(400).send({ msg: 'Invalid query' });
 	}
+	
+	const { topic, sort_by, order, limit, p } = req.query;
 
-	const { topic, sort_by, order } = req.query;
-
-	Promise.all([fetchArticles(topic, sort_by, order), checkTopicExists(topic)])
+	Promise.all([fetchArticles(topic, sort_by, order, limit, p), checkTopicExists(topic)])
 		.then(([articles]) => {
 			res.status(200).send({ articles });
 		})
