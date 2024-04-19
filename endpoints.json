@@ -17,6 +17,7 @@
 		},
 		"exampleResponse": {
 			"topics": [{ "slug": "football", "description": "Footie!" }]
+		}
 	},
 	"GET /api/articles": {
 		"description": "serves an array of articles paginated (use p to navigate pages, and limit for entries per page), including the vote count and comment count.",
