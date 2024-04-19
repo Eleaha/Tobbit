@@ -169,13 +169,13 @@ describe('/api/articles/:article_id', () => {
 
 describe('/api/articles', () => {
 	describe('GET /api/articles', () => {
-		test('GET 200: responds with an array of all articles without the body property and with a comment count', () => {
+		test('GET 200: responds with an array of the first 10 (default pagination) articles without the body property and with a comment count', () => {
 			return request(app)
 				.get('/api/articles')
 				.expect(200)
 				.then(({ body }) => {
 					const { articles } = body;
-					expect(articles.length).toBe(13);
+					expect(articles.length).toBe(10);
 					articles.forEach((article) => {
 						expect(article).toMatchObject({
 							author: expect.any(String),
@@ -196,13 +196,55 @@ describe('/api/articles', () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { articles } = body;
+					expect(articles.length).toBe(10)
 					expect(articles).toBeSortedBy('created_at', { descending: true });
+				});
+		});
+		test('GET 200: returned article objects include a key total_count with the total number of articles', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles.length).toBe(10);
+					articles.forEach((article) => {
+						expect(article).toMatchObject({
+							total_count: 13,
+						});
+					});
 				});
 		});
 	});
 
 	describe('POST /api/articles', () => {
-		test('POST 201: Responds with the posted article', () => {
+		test('POST 201: Responds with the posted article that includes a url', () => {
+			const postBody = {
+				author: 'rogersop',
+				title: 'Toby is my cat',
+				body: 'Toby is a dignified little gentleman, with bald lips and a short backleg.',
+				topic: 'cats',
+				article_img_url: 'testtttt',
+			};
+			return request(app)
+				.post('/api/articles')
+				.send(postBody)
+				.expect(201)
+				.then(({ body }) => {
+					const { newArticle } = body;
+					expect(newArticle).toMatchObject({
+						author: 'rogersop',
+						title: 'Toby is my cat',
+						body: 'Toby is a dignified little gentleman, with bald lips and a short backleg.',
+						topic: 'cats',
+						article_id: 14,
+						votes: 0,
+						created_at: expect.any(String),
+						comment_count: 0,
+						article_img_url: 'testtttt',
+					});
+				});
+		});
+		test('POST 201: Responds with the posted article with the default url if not given one', () => {
 			const postBody = {
 				author: 'rogersop',
 				title: 'Toby is my cat',
@@ -224,6 +266,8 @@ describe('/api/articles', () => {
 						votes: 0,
 						created_at: expect.any(String),
 						comment_count: 0,
+						article_img_url:
+							'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700',
 					});
 				});
 		});
@@ -255,7 +299,7 @@ describe('/api/articles', () => {
 					expect(body.msg).toBe('Bad request');
 				});
 		});
-		test("POST 400: throws a 400 error when given a author that doesn't exist", () => {
+		test("POST 400: throws a 400 error when given a topic that doesn't exist", () => {
 			const postBody = {
 				author: 'rogersop',
 				title: 'Toby is my cat',
@@ -275,7 +319,7 @@ describe('/api/articles', () => {
 	describe('GET /api/articles?topic', () => {
 		test('GET 200 topic? : responds with an array of objects with the topic specified in the topic query', () => {
 			return request(app)
-				.get('/api/articles?topic=mitch')
+				.get('/api/articles?topic=mitch&&limit=100')
 				.expect(200)
 				.then(({ body }) => {
 					const { articles } = body;
@@ -330,6 +374,7 @@ describe('/api/articles', () => {
 				});
 		});
 	});
+
 	describe('GET /api/articles?order=*', () => {
 		test('GET 200: responds with articles ordered by given order value', () => {
 			return request(app)
@@ -348,6 +393,91 @@ describe('/api/articles', () => {
 				});
 		});
 	});
+
+	describe('GET /api/articles?limit=*', () => {
+		test('GET 200: displays the number of entries specified by limit query', () => {
+			return request(app)
+				.get('/api/articles?limit=3')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles.length).toBe(3);
+					articles.forEach((article) => {
+						expect(article).toMatchObject({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							created_at: expect.any(String),
+							article_img_url: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						});
+					});
+				});
+		});
+		test('GET 400: invalid limit query value', () => {
+			return request(app)
+				.get('/api/articles?limit=garbage')
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		});
+	});
+
+	describe('GET /api/articles?p=*', () => {
+		test('GET 200: displays the correct page given a p query value', () => {
+			return request(app)
+				.get('/api/articles?limit=2&&p=2')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles.length).toBe(2);
+					expect(articles[0]).toMatchObject({
+						author: 'icellusedkars',
+						title: 'Sony Vaio; or, The Laptop',
+						article_id: 2,
+						topic: 'mitch',
+						created_at: expect.any(String),
+						article_img_url:
+							'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+						votes: 0,
+						comment_count: 0,
+						total_count: 13,
+					});
+					expect(articles[1]).toMatchObject({
+						author: 'butter_bridge',
+						title: 'Moustache',
+						article_id: 12,
+						topic: 'mitch',
+						created_at: expect.any(String),
+						article_img_url:
+							'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+						votes: 0,
+						comment_count: 0,
+						total_count: 13,
+					});
+				});
+		});
+		test('GET 404: page number does not exist/too high', () => {
+			return request(app)
+				.get('/api/articles?p=6')
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Not found');
+				});
+		});
+		test('GET 400: invalid p value', () => {
+			return request(app)
+				.get('/api/articles?p=garbage')
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).toBe('Bad request');
+				});
+		})
+	});
+
 	describe('GET /api/articles?query1=*/query2=* etc', () => {
 		test('GET 400: throws a 400 error if given an invalid query', () => {
 			return request(app)
@@ -355,6 +485,20 @@ describe('/api/articles', () => {
 				.expect(400)
 				.then(({ body }) => {
 					expect(body.msg).toBe('Invalid query');
+				});
+		});
+		test('GET 200: total_count only counts filtered rows', () => {
+			return request(app)
+				.get('/api/articles?topic=mitch')
+				.expect(200)
+				.then(({ body }) => {
+					const { articles } = body;
+					expect(articles.length).toBe(10);
+					articles.forEach((article) => {
+						expect(article).toMatchObject({
+							total_count: 12,
+						});
+					});
 				});
 		});
 	});
