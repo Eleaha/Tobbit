@@ -1,5 +1,6 @@
 const express = require('express');
 const { getTopics } = require('./controllers/topics.controllers');
+const cors = require('cors')
 
 const {
 	apiRouter,
@@ -10,6 +11,8 @@ const {
 } = require('./routes/routes.index');
 
 const app = express();
+
+app.use(cors())
 
 app.use(express.json());
 
