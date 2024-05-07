@@ -86,14 +86,14 @@ describe('/api', () => {
 });
 
 describe('/api/articles/:article_id', () => {
-	describe.only('GET /api/articles/:article_id', () => {
+	describe('GET /api/articles/:article_id', () => {
 		test('GET 200: Responds with the article that corresponds with the given article id', () => {
 			return request(app)
 				.get('/api/articles/2')
 				.expect(200)
 				.then(({ body }) => {
 					const { article } = body;
-					console.log(article)
+					console.log(article);
 					expect(article).toMatchObject({
 						article_id: 2,
 						title: 'Sony Vaio; or, The Laptop',
