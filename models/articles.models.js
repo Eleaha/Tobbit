@@ -52,9 +52,7 @@ function fetchArticles(
 	}
 
 	let dbQuery = `SELECT 
-            articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, 
-            COALESCE(SUM(comments.votes), 0)::INT
-            AS votes, 
+            articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, articles.votes, 
             COUNT(comments.article_id)::INT
             AS comment_count ,
 			COUNT(*) OVER()::INT

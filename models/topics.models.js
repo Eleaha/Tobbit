@@ -39,7 +39,6 @@ function insertTopic(topic) {
 				topicValues
 			)
 			.then(({ rows }) => {
-				console.log(rows, 'model')
 				return rows[0];
 			});
 	}
