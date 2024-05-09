@@ -159,7 +159,8 @@
 		"queries": [],
 		"example post": {
 			"username": "butter_bridge",
-			"body": "Wow I totally agree!"
+			"body": "Wow I totally agree!",
+			"article_id": 2
 		},
 		"exampleResponse": {
 			"comment": {

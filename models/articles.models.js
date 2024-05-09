@@ -27,13 +27,13 @@ function fetchArticles(
 	p = 1
 ) {
 	const validSortBy = [
-		'article_id',
 		'title',
 		'topic',
 		'author',
 		'body',
 		'created_at',
-		'article_img_url',
+		'votes',
+		'comment_count',
 	];
 	const validOrders = ['asc', 'desc'];
 
