@@ -22,6 +22,7 @@
 	"GET /api/articles": {
 		"description": "serves an array of articles paginated (use p to navigate pages, and limit for entries per page), including the vote count and comment count.",
 		"queries": ["author", "topic", "sort_by", "order", "limit", "p"],
+		"sort options": ["title", "topic", "author", "body", "created_at", "votes", "comment_count"],
 		"exampleResponse": {
 			"articles": [
 				{
