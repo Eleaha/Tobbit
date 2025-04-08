@@ -11,7 +11,6 @@ module.exports = [
   { "description": "Explore the world, one trip at a time", "slug": "travel" },
   { "description": "Who needs a pet?", "slug": "pets" },
   { "description": "The best movies for a movie night", "slug": "movies" },
-  { "description": "Can you hear the roar of the crowd?", "slug": "sports" },
   { "description": "Be the change, start with fitness", "slug": "health" },
   { "description": "Get that car into high gear!", "slug": "cars" },
   { "description": "Who doesn't love a good DIY project?", "slug": "diy" },
