@@ -8,7 +8,6 @@ module.exports = [
   { "description": "Time to hit the gym and crush it!", "slug": "fitness" },
   { "description": "Adventure awaits in a good book!", "slug": "books" },
   { "description": "Music makes the world go round", "slug": "music" },
-  { "description": "Who loves some sweet treats?", "slug": "desserts" },
   { "description": "Explore the world, one trip at a time", "slug": "travel" },
   { "description": "Who needs a pet?", "slug": "pets" },
   { "description": "The best movies for a movie night", "slug": "movies" },
